@@ -19,7 +19,6 @@ class f70L_HeCompressor():
         self.serialConnection = serial.Serial()
         self.serialConnection.baudrate = 9600
         self.serialConnection.bytesize = 8
-        self.serialConnection.parity = PARITY_NONE
         self.serialConnection.timeout = 2
         self.serialConnection.port = port
         
