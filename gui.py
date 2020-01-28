@@ -7,6 +7,7 @@ purpose: Serves as the main gui for the cryo controller
 import tkinter as tk
 from tkinter import messagebox
 import comp_serialif
+import sys
 
 ## Serial Port ##
 srCnxn = "/dev/ttyUSB0"
@@ -21,6 +22,10 @@ class App(tk.Tk):
         """
 
         self.compressor = comp_serialif.f70L_HeCompressor(srCnxn)
+        if self.compressor.startConnection() == False:
+            self.destroy()
+            return
+
 
         """
         Group 1 gui Elements.

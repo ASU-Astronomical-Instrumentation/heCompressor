@@ -34,7 +34,7 @@ class f70L_HeCompressor():
             self.serialConnection.open()
             if self.serialConnection.is_open:
                 return True
-        except SerialException:
+        except:
             print("There was an issue establishing the serial connection")
             return False
 
@@ -54,13 +54,13 @@ class f70L_HeCompressor():
         # First send the command to get me my temps
         readTempStr = b"$TEAA4B9\r" # This has the checksum already included
         self.serialConnection.write(readTempStr)
-        tempReply = self.serialConnection.readLine()
+        tempReply = self.serialConnection.readline()
 
         
 
         readPressureStr = b"$PR171F6\r" # this also has checksum included
         self.serialConnection.write(readPressureStr)
-        preaReply = self.serialConnection.readLine()
+        preaReply = self.serialConnection.readline()
         
         # Check reply length and checksum for temperature
         """
@@ -68,7 +68,7 @@ class f70L_HeCompressor():
         $TEA,086,040,031,000,3798<cr>
         """
         if len(tempReply) > 0:
-            rep = tempReply[0:len(tempReply)-5].encode("ASCII") # extract reply without crc
+            rep = tempReply[0:len(tempReply)-5] # extract reply without crc
             calccrc = hex(pycrc.crc16_modbus(rep))[2:]   #calculate crc of packet and convert to str
             retcrc = tempReply[len(tempReply)-5:-1] # extract crc 
             if calccrc == retcrc:
@@ -85,7 +85,7 @@ class f70L_HeCompressor():
         """
         
         if len(preaReply) > 0:
-            rep = preaReply[0:len(preaReply)-5].encode("ASCII") # extract reply without crc
+            rep = preaReply[0:len(preaReply)-5] # extract reply without crc
             calccrc = hex(pycrc.crc16_modbus(rep))[2:]   #calculate crc of packet and convert to str
             retcrc = preaReply[len(preaReply)-5:-1] # extract crc 
             if calccrc == retcrc:
@@ -112,7 +112,7 @@ class f70L_HeCompressor():
         command = b"$ON177CF\r" # Precalculated command + checksum
         expectedReply = "$ON1,8936\r" #Precalculated reply+checksum
         self.serialConnection.write(command)
-        reply = self.serialConnection.readLine()
+        reply = self.serialConnection.readline()
 
         if reply == expectedReply:
             print("Command: Turn On, was successfully sent")
@@ -136,7 +136,7 @@ class f70L_HeCompressor():
         command = b"$OFF9188\r" # Precalculated command + checksum
         expectedReply = "$OFF,bb90\r" #Precalculated reply + checksum
         self.serialConnection.write(command)
-        reply = self.serialConnection.readLine()
+        reply = self.serialConnection.readline()
 
         if reply == expectedReply:
             print("Command: Turn On, was successfully sent")
