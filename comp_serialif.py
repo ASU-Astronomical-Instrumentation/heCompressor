@@ -55,17 +55,19 @@ class f70L_HeCompressor():
         # First send the command to get me my temps
         readTempStr = b"$TEAA4B9\r" # This has the checksum already included
         self.serialConnection.write(readTempStr)
-        time.sleep(1)
-        tempReply = self.serialConnection.readline()
-        #print(tempReply)
-
-        
+        time.sleep(0.5)
+        tempReply = self.serialConnection.read(26)
+        print("debug:  comp_serialif --> readTemp in connectStats() --> Raw Reply = ")
+        print(tempReply)
+        print(len(tempReply))
 
         readPressureStr = b"$PR171F6\r" # this also has checksum included
         self.serialConnection.write(readPressureStr)
-        time.sleep(1)
-        preaReply = self.serialConnection.readline()
-        #print(len(preaReply))
+        time.sleep(0.5)
+        preaReply = self.serialConnection.read(14)
+        print("debug:  comp_serialif --> readPrea in connectStats() --> Raw Reply = ")
+        print(preaReply)
+        print(len(preaReply))
         
         # Check reply length and checksum for temperature
         """
@@ -74,7 +76,10 @@ class f70L_HeCompressor():
         """
         if len(tempReply) > 0:
             rep = tempReply[0:len(tempReply)-5] # extract reply without crc
-            calccrc = hex(pycrc.crc16_modbus(rep))[2:].encode("ASCII")  #calculate crc of packet and convert to str
+            #calccrc = hex().encode("ASCII")  #calculate crc of packet and convert to str
+            crc = pycrc.crc16_modbus(rep)
+            calccrc = ('%04x' % crc)
+            calccrc = calccrc.encode("ASCII")
             calccrc = calccrc.upper()
             retcrc = tempReply[len(tempReply)-5:-1] # extract crc 
             if  calccrc == retcrc:
@@ -93,7 +98,9 @@ class f70L_HeCompressor():
         
         if len(preaReply) > 0:
             rep = preaReply[0:len(preaReply)-5] # extract reply without crc
-            calccrc = hex(pycrc.crc16_modbus(rep))[2:].encode("ASCII")   #calculate crc of packet and convert to str
+            crc = pycrc.crc16_modbus(rep)
+            calccrc = ('%04x' % crc)
+            calccrc = calccrc.encode("ASCII")
             calccrc = calccrc.upper()
             retcrc = preaReply[len(preaReply)-5:-1] # extract crc 
             if calccrc == retcrc:

@@ -96,7 +96,7 @@ class App(tk.Tk):
 
             #return
     
-        self.after(7000, self.updateStats)
+        self.after(4000, self.updateStats)
 
 
 
