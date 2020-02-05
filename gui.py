@@ -81,10 +81,11 @@ class App(tk.Tk):
         data = self.compressor.collectStats()
         #data = ["023", "024", "025", "026"]
         if not data == None:
+            print(data)
             self.compressorcapsuletemp.config(text=data[0] + " °C")
             self.outletTemp.config(text=data[1] + " °C")
             self.inletTemp.config(text=data[2] + " °C")
-            self.returnPressure.config(text=data[3] + " PSIG")
+            self.returnPressure.config(text=data[3] + " PSIG") 
         else:
             messagebox.showerror(title="Update Stats Error", message="An error has occured while attempting to update stats")
             self.compressorcapsuletemp.config(text="ERROR")

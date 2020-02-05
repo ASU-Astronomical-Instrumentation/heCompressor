@@ -19,7 +19,8 @@ class f70L_HeCompressor():
         self.serialConnection = serial.Serial()
         self.serialConnection.baudrate = 9600
         self.serialConnection.bytesize = 8
-        self.serialConnection.timeout = 2
+        self.serialConnection.timeout = 4
+        self.serialConnection.parity=serial.PARITY_NONE
         self.serialConnection.port = port
         
 
@@ -54,13 +55,15 @@ class f70L_HeCompressor():
         # First send the command to get me my temps
         readTempStr = b"$TEAA4B9\r" # This has the checksum already included
         self.serialConnection.write(readTempStr)
-        tempReply = self.serialConnection.readline()
+        tempReply = self.serialConnection.read(26)
+        #print(tempReply)
 
         
 
         readPressureStr = b"$PR171F6\r" # this also has checksum included
         self.serialConnection.write(readPressureStr)
-        preaReply = self.serialConnection.readline()
+        preaReply = self.serialConnection.read(14)
+        #print(len(preaReply))
         
         # Check reply length and checksum for temperature
         """
@@ -69,10 +72,12 @@ class f70L_HeCompressor():
         """
         if len(tempReply) > 0:
             rep = tempReply[0:len(tempReply)-5] # extract reply without crc
-            calccrc = hex(pycrc.crc16_modbus(rep))[2:]   #calculate crc of packet and convert to str
+            calccrc = hex(pycrc.crc16_modbus(rep))[2:].encode("ASCII")  #calculate crc of packet and convert to str
+            calccrc = calccrc.upper()
             retcrc = tempReply[len(tempReply)-5:-1] # extract crc 
-            if calccrc == retcrc:
-                subst = tempReply.split()
+            if  calccrc == retcrc:
+                ree = tempReply.decode("ASCII")
+                subst = ree.split(',')
                 compressorStats.append(subst[1])
                 compressorStats.append(subst[2])
                 compressorStats.append(subst[3])
@@ -80,16 +85,18 @@ class f70L_HeCompressor():
 
         # Check reply length and checksum for pressure
         """
-        Example Reply
+        Example Reply4
         $PR1,079,2EBD<cr>
         """
         
         if len(preaReply) > 0:
             rep = preaReply[0:len(preaReply)-5] # extract reply without crc
-            calccrc = hex(pycrc.crc16_modbus(rep))[2:]   #calculate crc of packet and convert to str
+            calccrc = hex(pycrc.crc16_modbus(rep))[2:].encode("ASCII")   #calculate crc of packet and convert to str
+            calccrc = calccrc.upper()
             retcrc = preaReply[len(preaReply)-5:-1] # extract crc 
             if calccrc == retcrc:
-                subst = preaReply.split()
+                ree = preaReply.decode("ASCII")
+                subst = ree.split(',')
                 compressorStats.append(subst[1])
 
         # Finally, Return Stats
@@ -145,4 +152,7 @@ class f70L_HeCompressor():
             print("Command:= {}\nReply:= {}".format(command, reply))
 
 
-
+if __name__ == "__main__":
+    compressor = f70L_HeCompressor("/dev/ttyUSB0")
+    compressor.startConnection()
+    compressor.collectStats()
