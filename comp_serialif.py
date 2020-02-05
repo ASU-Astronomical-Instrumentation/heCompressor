@@ -117,9 +117,9 @@ class f70L_HeCompressor():
         if not self.serialConnection.is_open:
             return None
         command = b"$ON177CF\r" # Precalculated command + checksum
-        expectedReply = "$ON1,8936\r" #Precalculated reply+checksum
+        expectedReply = b"$ON1,8936\r" #Precalculated reply+checksum
         self.serialConnection.write(command)
-        reply = self.serialConnection.readline()
+        reply = self.serialConnection.read(len(expectedReply))
 
         if reply == expectedReply:
             print("Command: Turn On, was successfully sent")
@@ -141,9 +141,9 @@ class f70L_HeCompressor():
         if not self.serialConnection.is_open:
             return None
         command = b"$OFF9188\r" # Precalculated command + checksum
-        expectedReply = "$OFF,bb90\r" #Precalculated reply + checksum
+        expectedReply = b'$OFF,BB90\r' #Precalculated reply + checksum
         self.serialConnection.write(command)
-        reply = self.serialConnection.readline()
+        reply = self.serialConnection.read(len(expectedReply))
 
         if reply == expectedReply:
             print("Command: Turn On, was successfully sent")

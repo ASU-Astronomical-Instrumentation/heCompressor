@@ -58,10 +58,10 @@ class App(tk.Tk):
 
         self.comp_on_bttn = tk.Button(group_2, text="Compressor On")
         self.comp_on_bttn.grid(row=0)
-        self.comp_on_bttn.bind("<Button-1>", self.compressor.turnOn)
+        self.comp_on_bttn.bind("<Button-1>",  lambda event: self.compressor.turnOn())
         self.comp_off_bttn = tk.Button(group_2, text="Compressor Off")
         self.comp_off_bttn.grid(row=0, column=1)
-        self.comp_off_bttn.bind("<Button-1>", self.compressor.turnOff)
+        self.comp_off_bttn.bind("<Button-1>", lambda event: self.compressor.turnOff())
         
         """     
         TODO: Not Implemented in interface
