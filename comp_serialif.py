@@ -19,7 +19,7 @@ class f70L_HeCompressor():
         self.serialConnection = serial.Serial()
         self.serialConnection.baudrate = 9600
         self.serialConnection.bytesize = 8
-        self.serialConnection.timeout = 4
+        self.serialConnection.timeout = 3
         self.serialConnection.parity=serial.PARITY_NONE
         self.serialConnection.port = port
         
@@ -55,14 +55,16 @@ class f70L_HeCompressor():
         # First send the command to get me my temps
         readTempStr = b"$TEAA4B9\r" # This has the checksum already included
         self.serialConnection.write(readTempStr)
-        tempReply = self.serialConnection.read(26)
+        time.sleep(1)
+        tempReply = self.serialConnection.readline()
         #print(tempReply)
 
         
 
         readPressureStr = b"$PR171F6\r" # this also has checksum included
         self.serialConnection.write(readPressureStr)
-        preaReply = self.serialConnection.read(14)
+        time.sleep(1)
+        preaReply = self.serialConnection.readline()
         #print(len(preaReply))
         
         # Check reply length and checksum for temperature
@@ -146,9 +148,9 @@ class f70L_HeCompressor():
         reply = self.serialConnection.read(len(expectedReply))
 
         if reply == expectedReply:
-            print("Command: Turn On, was successfully sent")
+            print("Command: Turn off, was successfully sent")
         else:
-            print("An error has occured while attempting the command: Turn on")
+            print("An error has occured while attempting the command: Turn off")
             print("Command:= {}\nReply:= {}".format(command, reply))
 
 
